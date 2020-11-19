@@ -9,6 +9,10 @@
     background-color: #F5F5F5;
 }
 
+.chatListItem.active {
+    background-color: #c9afaf;
+}
+
 .chatListItem--avatar {
     widows: 50px;
     height: 50px;
