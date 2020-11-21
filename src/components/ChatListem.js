@@ -7,7 +7,7 @@ export default ({onClick, active, data}) => {
             className={`chatListItem ${active ? 'active' : ' '}`}
             onClick={onClick}
         >
-            <img  className="chatListItem--avatar" src={data.image} alt="avatar"/>
+            <img  className="chatListItem--avatar" src={data.image} alt="avatar" alt="" />
             <div className="chatListItem--lines">
                 <div className="chatListItem--line">
                     <div className="chatListItem--name">{data.title}</div>
