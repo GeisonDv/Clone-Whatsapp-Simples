@@ -1,10 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 
+import Api from './Api';
+
 import ChatListem from './components/ChatListem';
 import ChatIntro from './components/ChatIntro';
 import ChatWindow from './components/ChatWindow';
 import NewChat from './components/NewChat';
+import Login from './components/Login';
 
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
 import ChatIcon from '@material-ui/icons/Chat';
@@ -13,22 +16,34 @@ import SearchIcon from '@material-ui/icons/Search';
 
 export default () => {
 
-  const [chatlist, setChatList] = useState([
-    {chatId: 1, title: 'Fulano de Tal', image: 'https://www.w3schools.com/howto/img_avatar2.png'},
-    {chatId: 2, title: 'Fulano de Tal', image: 'https://www.w3schools.com/howto/img_avatar2.png'},
-    {chatId: 3, title: 'Fulano de Tal', image: 'https://www.w3schools.com/howto/img_avatar2.png'},
-    {chatId: 4, title: 'Fulano de Tal', image: 'https://www.w3schools.com/howto/img_avatar2.png'}
-  ]);
+  const [chatlist, setChatList] = useState([]);
   const [activeChat, setActiveChat] = useState({});
-  const [user, setUser] = useState({
-    id: 1234,
-    avatar: 'https://www.w3schools.com/howto/img_avatar2.png',
-    name: 'Geison Silva'
-  });
+  const [user, setUser] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
+
+  useEffect(() => {
+    if(user !== null) {
+      let unsub = Api.onChatList(user.id, setChatList);
+      return unsub;
+    }
+  }, [user]);
 
   const handleNewChat = () => {
     setShowNewChat(true);
+  }
+
+  const handleLoginData = async (u) => {
+    let newUser = {
+      id: u.uid,
+      name: u.displayName,
+      avatar: u.photoURL
+    };
+    await Api.addUser(newUser);
+    setUser(newUser);
+  }
+
+  if(user === null) {
+    return(<Login onReceive={handleLoginData} />);
   }
 
   return (
@@ -62,13 +77,14 @@ export default () => {
           </div>
         </div>
 
-        <div className="chatlist">
-          {chatlist.map((item, key) =>(
-              <ChatListem 
-              key={key}
+        <div className="chatlist">          
+          {chatlist.map((item, key)=>(
+            <ChatListem 
+              key={key} 
               data={item}
               active={activeChat.chatId === chatlist[key].chatId}
-              onClick={() => setActiveChat(chatlist[key])}/>
+              onClick={()=>setActiveChat(chatlist[key])}
+            />          
           ))}
         </div>
       </div>
@@ -76,6 +92,7 @@ export default () => {
             {activeChat.chatId !== undefined && 
               <ChatWindow 
                 user={user}
+                data={activeChat}
               />
             }
               {activeChat.chatId === undefined && 
